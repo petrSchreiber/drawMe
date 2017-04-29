@@ -1,0 +1,96 @@
+' DrawMe
+
+type DrawMe
+  private
+  
+  cursor as tbgl_tVector2f
+  
+  public
+  
+  function drawAt(x as single, y as single)
+    me.cursor.x = x
+    me.cursor.y = y
+  end function
+  
+  '
+  
+  function toColor(r as byte, g as byte, b as byte, optional a as byte = 255) as long
+    dim rgba as tbgl_trgba
+    with rgba
+      .r = r
+      .g = g
+      .b = b
+      .a = a
+    end with
+    
+    dim encodedColor as long at varptr(rgba)
+    return encodedColor
+  end function
+  '
+  
+  function verticalGradient(width as single, height as single, fromColor as long, toColor as long)    
+    dim rgbaFrom as tbgl_tRGBA at varptr(fromColor)
+    dim rgbaTo   as tbgl_tRGBA at varptr(toColor)
+    
+    tbgl_pushMatrix
+      tbgl_translate me.cursor.x, me.cursor.y
+      tbgl_scale width, height      
+      tbgl_pushStateProtect %TBGL_LIGHTING
+        tbgl_pushColor 255,255,255
+          tbgl_beginPoly %GL_QUADS
+          
+            tbgl_pushColor rgbaFrom.R, rgbaFrom.G, rgbaFrom.B, rgbaFrom.A
+              tbgl_vertex 0,0
+              tbgl_vertex 1,0
+            tbgl_popColor  
+     
+            tbgl_pushColor rgbaTo.R, rgbaTo.G, rgbaTo.B, rgbaTo.A
+              tbgl_vertex 1,1
+              tbgl_vertex 0,1
+            tbgl_popColor
+              
+          tbgl_endPoly
+        tbgl_popColor 
+      tbgl_popStateProtect
+    tbgl_popMatrix
+  end function
+
+  function horizontalGradient(width as single, height as single, fromColor as long, toColor as long)    
+    dim rgbaFrom as tbgl_tRGBA at varptr(fromColor)
+    dim rgbaTo   as tbgl_tRGBA at varptr(toColor)
+    
+    tbgl_pushMatrix
+      tbgl_translate me.cursor.x, me.cursor.y
+      tbgl_scale width, height      
+      tbgl_pushStateProtect %TBGL_LIGHTING
+        tbgl_pushColor 255,255,255
+          tbgl_beginPoly %GL_QUADS
+          
+            tbgl_pushColor rgbaFrom.R, rgbaFrom.G, rgbaFrom.B, rgbaFrom.A
+              tbgl_vertex 0,0
+              tbgl_vertex 0,1
+            tbgl_popColor  
+     
+            tbgl_pushColor rgbaTo.R, rgbaTo.G, rgbaTo.B, rgbaTo.A
+              tbgl_vertex 1,1
+              tbgl_vertex 1,0
+            tbgl_popColor
+              
+          tbgl_endPoly
+        tbgl_popColor 
+      tbgl_popStateProtect
+    tbgl_popMatrix
+  end function
+  
+  function coloredCircle(radius as single, circleColor as long)    
+    dim rgbaCircleColor as tbgl_tRGBA at varptr(circleColor)
+    
+    tbgl_pushMatrix
+      tbgl_translate me.cursor.x, me.cursor.y
+      tbgl_pushColor rgbaCircleColor.r, rgbaCircleColor.g, rgbaCircleColor.b, rgbaCircleColor.a  
+        tbgl_ngon(0, 0, radius, 36)
+      tbgl_popColor
+    tbgl_popMatrix    
+  end function  
+end type
+
